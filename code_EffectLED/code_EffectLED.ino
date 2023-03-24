@@ -266,7 +266,7 @@ void Fire(int Cooling, int Sparking, int SpeedDelay) {
         heat[y] = heat[y] + random(160,255);
         //heat[y] = random(160,255);
       }
-      if(millis() -   timeFire > 5)
+      if(millis() -   timeFire > SpeedDelay)
       {
          timeFire = millis();
          countFire ++;
@@ -568,7 +568,7 @@ byte * Wheel(byte WheelPos) {
 
 // Function time run
 #define maxEff      29
-uint8_t eff = 26;
+uint8_t eff = 9;
 uint32_t timeRunChange = 0;
 uint8_t countTimeRun = 0;
 void timeRunChangeMode(uint8_t Time)
@@ -660,7 +660,7 @@ void loop() {
       break;
     case 9:
       Fire(22,120,2);
-      timeRunChangeMode(10);
+      timeRunChangeMode(100);
       break; 
     case 10:
       TwinkleRandom(20, 100);
