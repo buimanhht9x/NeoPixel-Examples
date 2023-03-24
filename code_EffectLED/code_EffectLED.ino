@@ -1,28 +1,36 @@
 #include <Adafruit_NeoPixel.h>
 #define PIN 6
 #define NUM_LEDS 12
-// Parameter 1 = number of pixels in strip
-// Parameter 2 = pin number (most are valid)
-// Parameter 3 = pixel type flags, add together as needed:
-//   NEO_KHZ800  800 KHz bitstream (most NeoPixel products w/WS2812 LEDs)
-//   NEO_KHZ400  400 KHz (classic 'v1' (not v2) FLORA pixels, WS2811 drivers)
-//   NEO_GRB     Pixels are wired for GRB bitstream (most NeoPixel products)
-//   NEO_RGB     Pixels are wired for RGB bitstream (v1 FLORA pixels, not v2)
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(NUM_LEDS, PIN, NEO_GRB + NEO_KHZ800);
 
+// Bouncing Balls Multi Color
+byte color[12][3] = { {0xff, 0   , 0   }, 
+                      {0xff, 0xff, 0xff}, 
+                      {0   , 0   , 0xff},
+                      {0   , 0   , 0xff},
+                      {0   , 0   , 0xff},
+                      {0   , 0   , 0xff},
+                      {0   , 0   , 0xff},
+                      {0   , 0   , 0xff},
+                      {0   , 0   , 0xff},
+                      {0   , 0   , 0xff},
+                      {0   , 0   , 0xff},
+                      {0   , 0   , 0xff}};
+
+
 void setup() {
-  strip.begin();
-  strip.show(); // Initialize all pixels to 'off'
+  // put your setup code here, to run once:
+    strip.begin();
+    strip.show(); // Initialize all pixels to 'off'
 }
 
-// *** REPLACE FROM HERE ***
 void loop() {
-  byte colors[3][3] = { {0xff, 0,0}, 
-                        {0xff, 0xff, 0xff}, 
-                        {0   , 0   , 0xff} };
-
-  BouncingColoredBalls(10, colors);
+  // put your main code here, to run repeatedly:
+  BouncingColoredBalls(12,color);
 }
+
+
+// EFF Bouncing Balls Multi Color
 
 void BouncingColoredBalls(int BallCount, byte colors[][3]) {
   float Gravity = -9.81;
@@ -62,43 +70,30 @@ void BouncingColoredBalls(int BallCount, byte colors[][3]) {
       Position[i] = round( Height[i] * (NUM_LEDS - 1) / StartHeight);
     }
   
-    for (int i = 0 ; i < BallCount ; i++) {
+    for (int i = 0 ; i < NUM_LEDS ; i++) {
       setPixel(Position[i],colors[i][0],colors[i][1],colors[i][2]);
     }
-    
+
     showStrip();
     setAll(0,0,0);
   }
 }
-// *** REPLACE TO HERE ***
 
-void showStrip() {
- #ifdef ADAFRUIT_NEOPIXEL_H 
-   // NeoPixel
-   strip.show();
- #endif
- #ifndef ADAFRUIT_NEOPIXEL_H
-   // FastLED
-   FastLED.show();
- #endif
-}
 
-void setPixel(int Pixel, byte red, byte green, byte blue) {
- #ifdef ADAFRUIT_NEOPIXEL_H 
-   // NeoPixel
+
+
+void setPixel(int Pixel, byte red, byte green, byte blue) 
+{
    strip.setPixelColor(Pixel, strip.Color(red, green, blue));
- #endif
- #ifndef ADAFRUIT_NEOPIXEL_H 
-   // FastLED
-   leds[Pixel].r = red;
-   leds[Pixel].g = green;
-   leds[Pixel].b = blue;
- #endif
 }
-
-void setAll(byte red, byte green, byte blue) {
+void setAll(byte red, byte green, byte blue) 
+ {
   for(int i = 0; i < NUM_LEDS; i++ ) {
     setPixel(i, red, green, blue); 
   }
   showStrip();
+}
+void showStrip()
+{
+   strip.show();
 }
