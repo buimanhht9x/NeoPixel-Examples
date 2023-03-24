@@ -19,21 +19,28 @@ void setup() {
 void loop() {
   rainbowCycle(20);
 }
+uint32_t timeRainbowCycle = 0;
+int countRainbowCycle = 0;
 
 void rainbowCycle(int SpeedDelay) {
   byte *c;
   uint16_t i, j;
-
-  for(j=0; j<256*5; j++) { // 5 cycles of all colors on wheel
-    for(i=0; i< NUM_LEDS; i++) {
-      c=Wheel(((i * 256 / NUM_LEDS) + j) & 255);
-      setPixel(i, *c, *(c+1), *(c+2));
-    }
-    showStrip();
-    delay(SpeedDelay);
+  if(millis() -   timeRainbowCycle > SpeedDelay)
+  {
+          timeRainbowCycle = millis();
+          countRainbowCycle++;
+          if(countRainbowCycle >=  256*5)
+          {
+              countRainbowCycle = 0;
+          }
+          for(i=0; i< NUM_LEDS; i++) 
+          {
+              c=Wheel(((i * 256 / NUM_LEDS) + countRainbowCycle) & 255);
+              setPixel(i, *c, *(c+1), *(c+2));
+          }
+          showStrip();
   }
 }
-
 byte * Wheel(byte WheelPos) {
   static byte c[3];
   
@@ -52,9 +59,9 @@ byte * Wheel(byte WheelPos) {
    c[1]=WheelPos * 3;
    c[2]=255 - WheelPos * 3;
   }
-
   return c;
 }
+
 // *** REPLACE TO HERE ***
 
 void showStrip() {

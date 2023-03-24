@@ -411,12 +411,13 @@ void Sparkle(byte red, byte green, byte blue, int SpeedDelay) {
 
 ////////////////////////////////////////////////////////////////////////////////////////
 // Strobe
-// Nhaý flash Strobe(0xff, 0x00, 0xff, 30, 50, 1000);
+// Nhaý flash 
+// Strobe(0xff, 0x00, 0xff, 100, 500);
 uint32_t timeStrobe = 0;
 int countStrobe = 0;
 uint8_t stateStrobe = 0;
 
-void Strobe(byte red, byte green, byte blue, int StrobeCount, int FlashDelay, int EndPause){
+void Strobe(byte red, byte green, byte blue, int FlashDelay, int EndPause){
   switch(stateStrobe)
   {
      case 0:
@@ -424,7 +425,7 @@ void Strobe(byte red, byte green, byte blue, int StrobeCount, int FlashDelay, in
         {
              timeStrobe = millis();
              countStrobe ++;
-             if(countStrobe >= StrobeCount)
+             if(countStrobe >= 8)
              {
                 countStrobe = 0;
                 stateStrobe = 1;
@@ -443,8 +444,72 @@ void Strobe(byte red, byte green, byte blue, int StrobeCount, int FlashDelay, in
              }  
         }
         break;
-     case 1:      
-        if(millis() -   timeStrobe > EndPause)
+     case 1:
+         
+         if(millis() -   timeStrobe > EndPause)
+        {
+             timeStrobe = millis();
+             stateStrobe = 2;
+        }
+        break;
+     case 2:
+        if(millis() -   timeStrobe > FlashDelay)
+        {
+             timeStrobe = millis();
+             countStrobe ++;
+             if(countStrobe >= 8)
+             {
+                countStrobe = 0;
+                stateStrobe = 3;
+                setAll(0,0,0);
+                showStrip();
+             }
+             if(countStrobe %2 == 0)
+             {
+                setAll(red,green,blue);
+                showStrip();
+             }
+             else
+             {
+                setAll(0,0,0);
+                showStrip();
+             }  
+        }
+        break;
+     case 3:    
+         if(millis() -   timeStrobe > EndPause)
+        {
+             timeStrobe = millis();
+             stateStrobe = 4;
+        }
+        break;
+    case 4:
+        if(millis() -   timeStrobe > FlashDelay)
+        {
+             timeStrobe = millis();
+             countStrobe ++;
+             if(countStrobe >= 23)
+             {
+                countStrobe = 0;
+                stateStrobe = 5;
+                setAll(0,0,0);
+                showStrip();
+             }
+             if(countStrobe %2 == 0)
+             {
+                setAll(red,green,blue);
+                showStrip();
+             }
+             else
+             {
+                setAll(0,0,0);
+                showStrip();
+             }  
+        }
+        break;
+     case 5:
+         
+         if(millis() -   timeStrobe > EndPause)
         {
              timeStrobe = millis();
              stateStrobe = 0;
@@ -452,17 +517,58 @@ void Strobe(byte red, byte green, byte blue, int StrobeCount, int FlashDelay, in
         break;
   }
 }
-
 //////////////////////////////////////////////////////////////////////////////
+// RainBow cycle
+uint32_t timeRainbowCycle = 0;
+int countRainbowCycle = 0;
 
-
+void rainbowCycle(int SpeedDelay) {
+  byte *c;
+  uint16_t i, j;
+  if(millis() -   timeRainbowCycle > SpeedDelay)
+  {
+          timeRainbowCycle = millis();
+          countRainbowCycle++;
+          if(countRainbowCycle >=  256*5)
+          {
+              countRainbowCycle = 0;
+          }
+          for(i=0; i< NUM_LEDS; i++) 
+          {
+              c=Wheel(((i * 256 / NUM_LEDS) + countRainbowCycle) & 255);
+              setPixel(i, *c, *(c+1), *(c+2));
+          }
+          showStrip();
+  }
+}
+byte * Wheel(byte WheelPos) {
+  static byte c[3];
+  
+  if(WheelPos < 85) {
+   c[0]=WheelPos * 3;
+   c[1]=255 - WheelPos * 3;
+   c[2]=0;
+  } else if(WheelPos < 170) {
+   WheelPos -= 85;
+   c[0]=255 - WheelPos * 3;
+   c[1]=0;
+   c[2]=WheelPos * 3;
+  } else {
+   WheelPos -= 170;
+   c[0]=0;
+   c[1]=WheelPos * 3;
+   c[2]=255 - WheelPos * 3;
+  }
+  return c;
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////
 
 
 
 
 // Function time run
-#define maxEff      25
-uint8_t eff = 18;
+#define maxEff      29
+uint8_t eff = 26;
 uint32_t timeRunChange = 0;
 uint8_t countTimeRun = 0;
 void timeRunChangeMode(uint8_t Time)
@@ -550,7 +656,7 @@ void loop() {
       break;
     case 8:
       funFadeInOut();
-      timeRunChangeMode(5);
+      timeRunChangeMode(50);
       break;
     case 9:
       Fire(22,120,2);
@@ -616,9 +722,24 @@ void loop() {
       Sparkle(0xff,0xff,0xff, 50);
       timeRunChangeMode(5);
       break;
+    case 25:
+      rainbowCycle(20);
+      timeRunChangeMode(50);
+      break;
+    case 26:
+      Strobe(0xff, 0x00, 0xff, 100, 500);
+      timeRunChangeMode(10);
+      break;
+    case 27:
+      Strobe(0x00, 0xff, 0xff, 100, 500);
+      timeRunChangeMode(10);
+      break;
+    case 28:
+      Strobe(0xff, 0xff, 0x00, 100, 500);
+      timeRunChangeMode(10);
+      break;
     
-       
-    
+     
   }
   
 }

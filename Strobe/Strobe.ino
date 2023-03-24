@@ -20,13 +20,13 @@ void loop() {
   // Slower:
   // Strobe(0xff, 0x77, 0x00, 10, 100, 1000);
   // Fast:
-  Strobe(0xff, 0x00, 0xff, 30, 50, 1000);
+  Strobe(0xff, 0x00, 0xff, 100, 500);
 }
 uint32_t timeStrobe = 0;
 int countStrobe = 0;
 uint8_t stateStrobe = 0;
 
-void Strobe(byte red, byte green, byte blue, int StrobeCount, int FlashDelay, int EndPause){
+void Strobe(byte red, byte green, byte blue, int FlashDelay, int EndPause){
   switch(stateStrobe)
   {
      case 0:
@@ -34,7 +34,7 @@ void Strobe(byte red, byte green, byte blue, int StrobeCount, int FlashDelay, in
         {
              timeStrobe = millis();
              countStrobe ++;
-             if(countStrobe >= StrobeCount)
+             if(countStrobe >= 8)
              {
                 countStrobe = 0;
                 stateStrobe = 1;
@@ -54,6 +54,69 @@ void Strobe(byte red, byte green, byte blue, int StrobeCount, int FlashDelay, in
         }
         break;
      case 1:
+         
+         if(millis() -   timeStrobe > EndPause)
+        {
+             timeStrobe = millis();
+             stateStrobe = 2;
+        }
+        break;
+     case 2:
+        if(millis() -   timeStrobe > FlashDelay)
+        {
+             timeStrobe = millis();
+             countStrobe ++;
+             if(countStrobe >= 8)
+             {
+                countStrobe = 0;
+                stateStrobe = 3;
+                setAll(0,0,0);
+                showStrip();
+             }
+             if(countStrobe %2 == 0)
+             {
+                setAll(red,green,blue);
+                showStrip();
+             }
+             else
+             {
+                setAll(0,0,0);
+                showStrip();
+             }  
+        }
+        break;
+     case 3:    
+         if(millis() -   timeStrobe > EndPause)
+        {
+             timeStrobe = millis();
+             stateStrobe = 4;
+        }
+        break;
+    case 4:
+        if(millis() -   timeStrobe > FlashDelay)
+        {
+             timeStrobe = millis();
+             countStrobe ++;
+             if(countStrobe >= 23)
+             {
+                countStrobe = 0;
+                stateStrobe = 5;
+                setAll(0,0,0);
+                showStrip();
+             }
+             if(countStrobe %2 == 0)
+             {
+                setAll(red,green,blue);
+                showStrip();
+             }
+             else
+             {
+                setAll(0,0,0);
+                showStrip();
+             }  
+        }
+        break;
+     case 5:
          
          if(millis() -   timeStrobe > EndPause)
         {
