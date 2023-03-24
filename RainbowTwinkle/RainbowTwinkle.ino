@@ -19,20 +19,40 @@ void setup() {
 void loop() {
   TwinkleRandom(20, 100, false);
 }
-
+uint32_t timeTwinkleRandom = 0;
+int countTwinkleRandom = 0;
+uint8_t stateTwinkleRandom = 0;
 void TwinkleRandom(int Count, int SpeedDelay, boolean OnlyOne) {
-  setAll(0,0,0);
-  
-  for (int i=0; i<Count; i++) {
-     setPixel(random(NUM_LEDS),random(0,255),random(0,255),random(0,255));
-     showStrip();
-     delay(SpeedDelay);
-     if(OnlyOne) { 
+  switch(stateTwinkleRandom)
+  {
+     case 0:
        setAll(0,0,0); 
-     }
-   }
-  
-  delay(SpeedDelay);
+       stateTwinkleRandom = 1;
+       break;
+     case 1:
+       if(millis() -   timeTwinkleRandom > SpeedDelay)
+       {
+          timeTwinkleRandom = millis();
+          countTwinkleRandom ++;
+          if(countTwinkleRandom >= Count)
+          {
+              countTwinkleRandom = 0;
+              stateTwinkleRandom = 2;
+          }
+          setPixel(random(NUM_LEDS),random(0,255),random(0,255),random(0,255));
+          showStrip();
+           if(OnlyOne)
+             setAll(0,0,0); 
+        }
+        break;
+     case 2:
+       if(millis() -   timeTwinkleRandom > SpeedDelay)
+       {
+          timeTwinkleRandom = millis();
+          stateTwinkleRandom = 0;
+       }
+       break;
+  }
 }
 // *** REPLACE TO HERE ***
 

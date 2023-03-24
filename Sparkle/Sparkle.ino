@@ -17,15 +17,30 @@ void setup() {
 
 // *** REPLACE FROM HERE ***
 void loop() {
-  Sparkle(0xff, 0x00, 0xff, 100);
+  Sparkle(0xff,0, 0xff, 100);
 }
 
+uint32_t timeSparkle = 0;
+int countSparkle = 0;
+uint8_t stateSparkle = 0;
 void Sparkle(byte red, byte green, byte blue, int SpeedDelay) {
-  int Pixel = random(NUM_LEDS);
-  setPixel(Pixel,red,green,blue);
-  showStrip();
-  delay(SpeedDelay);
-  setPixel(Pixel,0,0,0);
+  if(millis() -   timeSparkle > SpeedDelay)
+  {
+          timeSparkle = millis();
+          int Pixel = random(NUM_LEDS);
+          setPixel(Pixel,red,green,blue);
+          showStrip();
+
+          Pixel = random(NUM_LEDS);
+          setPixel(Pixel,red,green,blue);
+          showStrip();
+
+          Pixel = random(NUM_LEDS);
+          setPixel(Pixel,red,green,blue);
+          showStrip();
+          
+          setPixel(Pixel,0,0,0);
+  }
 }
 // *** REPLACE TO HERE ***
 

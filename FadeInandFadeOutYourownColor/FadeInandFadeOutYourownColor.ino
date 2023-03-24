@@ -17,26 +17,82 @@ void setup() {
 
 // *** REPLACE FROM HERE ***
 void loop() { 
-  FadeInOut(0xff, 0x77, 0x00);
+  funFadeInOut();
+}
+uint8_t countEffFadeInOut = 0;
+#define maxEffFadeInOut 7
+void funFadeInOut()
+{
+  switch(countEffFadeInOut)
+  {
+    case 0:
+       FadeInOut(0xff, 0x00, 0x00);
+       break;
+    case 1:
+       FadeInOut(0x00, 0xff, 0x00);
+       break;
+    case 2:
+       FadeInOut(0x00, 0x00, 0xff);
+       break;
+    case 3:
+       FadeInOut(0xff, 0xff, 0x00);
+       break;
+    case 4:
+       FadeInOut(0x00, 0xff, 0xff);
+       break;
+    case 5:
+       FadeInOut(0xff, 0x00, 0xff);
+       break;
+    case 6:
+       FadeInOut(0xff, 0xff, 0xff);
+       break;
+  }
 }
 
+
+uint32_t timeFadeInOut = 0;
+int countFadeInOut = 0;
+uint8_t stateFadeInOut = 0;
+#define timeDelayFadeInOut   2
 void FadeInOut(byte red, byte green, byte blue){
   float r, g, b;
-      
-  for(int k = 0; k < 256; k=k+1) { 
-    r = (k/256.0)*red;
-    g = (k/256.0)*green;
-    b = (k/256.0)*blue;
-    setAll(r,g,b);
-    showStrip();
-  }
-     
-  for(int k = 255; k >= 0; k=k-2) {
-    r = (k/256.0)*red;
-    g = (k/256.0)*green;
-    b = (k/256.0)*blue;
-    setAll(r,g,b);
-    showStrip();
+  switch(stateFadeInOut)
+  {
+     case 0:
+        if(millis() -   timeFadeInOut > timeDelayFadeInOut)
+        {
+           timeFadeInOut = millis();
+           countFadeInOut++;
+           if(countFadeInOut >= 255)
+           {
+              stateFadeInOut = 1;
+           } 
+        }
+        r = (countFadeInOut/256.0)*red;
+        g = (countFadeInOut/256.0)*green;
+        b = (countFadeInOut/256.0)*blue;
+        setAll(r,g,b);
+        showStrip();
+        break;
+     case 1:
+        if(millis() -   timeFadeInOut > 10)
+        {
+           timeFadeInOut = millis();
+           countFadeInOut = countFadeInOut - 2;
+           if(countFadeInOut <= 0)
+           {
+              stateFadeInOut = 0;
+              countEffFadeInOut ++;
+              if(countEffFadeInOut >= maxEffFadeInOut)
+                countEffFadeInOut = 0;
+           } 
+        }
+        r = (countFadeInOut/256.0)*red;
+        g = (countFadeInOut/256.0)*green;
+        b = (countFadeInOut/256.0)*blue;
+        setAll(r,g,b);
+        showStrip();
+        break;
   }
 }
 

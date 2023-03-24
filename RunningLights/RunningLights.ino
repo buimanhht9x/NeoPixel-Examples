@@ -19,25 +19,34 @@ void setup() {
 void loop() {
   RunningLights(0xff,0x00,0xff, 50);
 }
-
+uint32_t timeRunningLights = 0;
+int countRunningLights = 0;
+uint8_t stateRunningLights = 0;
+int positionRunningLights=0;
 void RunningLights(byte red, byte green, byte blue, int WaveDelay) {
-  int Position=0;
   
-  for(int i=0; i<NUM_LEDS*2; i++)
+  if(millis() -   timeRunningLights > WaveDelay)
   {
-      Position++; // = 0; //Position + Rate;
-      for(int i=0; i<NUM_LEDS; i++) {
-        // sine wave, 3 offset waves make a rainbow!
-        //float level = sin(i+Position) * 127 + 128;
-        //setPixel(i,level,0,0);
-        //float level = sin(i+Position) * 127 + 128;
-        setPixel(i,((sin(i+Position) * 127 + 128)/255)*red,
-                   ((sin(i+Position) * 127 + 128)/255)*green,
-                   ((sin(i+Position) * 127 + 128)/255)*blue);
-      }
-      
-      showStrip();
-      delay(WaveDelay);
+          timeRunningLights = millis();
+          countRunningLights++;
+          if(countRunningLights >=  NUM_LEDS*2 - 1)
+          {
+              countRunningLights = 0;
+              positionRunningLights=0;
+          }
+          
+          positionRunningLights++; // = 0; //Position + Rate;
+          for(int i=0; i<NUM_LEDS; i++) {
+            // sine wave, 3 offset waves make a rainbow!
+            //float level = sin(i+Position) * 127 + 128;
+            //setPixel(i,level,0,0);
+            //float level = sin(i+Position) * 127 + 128;
+            setPixel(i,((sin(i+positionRunningLights) * 127 + 128)/255)*red,
+                   ((sin(i+positionRunningLights) * 127 + 128)/255)*green,
+                   ((sin(i+positionRunningLights) * 127 + 128)/255)*blue);
+          }
+          showStrip();
+          
   }
 }
 // *** REPLACE TO HERE ***

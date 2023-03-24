@@ -17,36 +17,76 @@ void setup() {
 
 // *** REPLACE FROM HERE ***
 void loop() {
-  CylonBounce(0xff, 0xff, 0, 4, 10, 50);
+  CylonBounce(0xff, 0x00, 0, 6, 10, 50);
 }
 
+
+uint32_t timeSpeedDelayCylonBounce = 0;
+uint32_t timeReturnDelayCylonBounce = 0;
+uint16_t countSpeedDelay = 0;
+uint16_t countReturnDelay = 0;
+uint8_t stateCylonBounce = 0;
 void CylonBounce(byte red, byte green, byte blue, int EyeSize, int SpeedDelay, int ReturnDelay){
 
-  for(int i = 0; i < NUM_LEDS-EyeSize-2; i++) {
-    setAll(0,0,0);
-    setPixel(i, red/10, green/10, blue/10);
-    for(int j = 1; j <= EyeSize; j++) {
-      setPixel(i+j, red, green, blue); 
-    }
-    setPixel(i+EyeSize+1, red/10, green/10, blue/10);
-    showStrip();
-    delay(SpeedDelay);
-  }
-
-  delay(ReturnDelay);
-
-  for(int i = NUM_LEDS-EyeSize-2; i > 0; i--) {
-    setAll(0,0,0);
-    setPixel(i, red/10, green/10, blue/10);
-    for(int j = 1; j <= EyeSize; j++) {
-      setPixel(i+j, red, green, blue); 
-    }
-    setPixel(i+EyeSize+1, red/10, green/10, blue/10);
-    showStrip();
-    delay(SpeedDelay);
+ 
+  switch(stateCylonBounce)
+  {
+    case 0:
+      if(millis() - timeSpeedDelayCylonBounce > SpeedDelay)
+      {
+          timeSpeedDelayCylonBounce = millis();
+          countSpeedDelay++;
+          if(countSpeedDelay >= NUM_LEDS-EyeSize-2)
+          { 
+            stateCylonBounce = 1;
+            timeReturnDelayCylonBounce = millis();
+            timeSpeedDelayCylonBounce = millis();
+          }
+          setAll(0,0,0);
+          setPixel(countSpeedDelay, red/10, green/10, blue/10);
+          for(int j = 1; j <= EyeSize; j++) {
+            setPixel(countSpeedDelay+j, red, green, blue); 
+          }
+          setPixel(countSpeedDelay+EyeSize+1, red/10, green/10, blue/10);
+          showStrip();
+      }
+      break;
+    case 1:
+      if(millis() - timeReturnDelayCylonBounce > ReturnDelay)
+      {
+          timeReturnDelayCylonBounce = millis();
+          stateCylonBounce = 2;
+      }
+      break;
+    case 2:
+      if(millis() - timeSpeedDelayCylonBounce > SpeedDelay)
+      {
+          timeSpeedDelayCylonBounce = millis();
+          countSpeedDelay--;
+          if(countSpeedDelay <= 0)
+          {
+              stateCylonBounce = 3;
+              timeReturnDelayCylonBounce = millis();
+          }
+          setAll(0,0,0);
+          setPixel(countSpeedDelay, red/10, green/10, blue/10);
+          for(int j = 1; j <= EyeSize; j++) {
+            setPixel(countSpeedDelay+j, red, green, blue); 
+          }
+          setPixel(countSpeedDelay+EyeSize+1, red/10, green/10, blue/10);
+          showStrip();
+      }
+      break;
+    case 3:
+      if(millis() - timeReturnDelayCylonBounce > ReturnDelay)
+      {
+          timeReturnDelayCylonBounce = millis();
+          timeSpeedDelayCylonBounce = millis();
+          stateCylonBounce = 0;
+      }
+      break;
   }
   
-  delay(ReturnDelay);
 }
 // *** REPLACE TO HERE ***
 

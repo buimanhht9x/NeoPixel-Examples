@@ -17,44 +17,68 @@ void setup() {
 
 // *** REPLACE FROM HERE ***
 void loop() {
-  Fire(55,120,15);
+  Fire(22,120,2);
 }
+uint32_t timeFire = 0;
+int countFire = 0;
+uint8_t stateFire = 0;
 
 void Fire(int Cooling, int Sparking, int SpeedDelay) {
   static byte heat[NUM_LEDS];
   int cooldown;
-  
-  // Step 1.  Cool down every cell a little
-  for( int i = 0; i < NUM_LEDS; i++) {
-    cooldown = random(0, ((Cooling * 10) / NUM_LEDS) + 2);
-    
-    if(cooldown>heat[i]) {
-      heat[i]=0;
-    } else {
-      heat[i]=heat[i]-cooldown;
-    }
+  switch(stateFire)
+  {
+    case 0:
+        // Step 1.  Cool down every cell a little
+       for( int i = 0; i < NUM_LEDS; i++) 
+       {
+           cooldown = random(0, ((Cooling * 10) / NUM_LEDS) + 2);
+            
+           if(cooldown>heat[i]) 
+           {
+              heat[i]=0;
+           } 
+           else 
+           {
+              heat[i]=heat[i]-cooldown;
+           }
+       }
+      
+      // Step 2.  Heat from each cell drifts 'up' and diffuses a little
+      for( int k= NUM_LEDS - 1; k >= 2; k--) {
+        heat[k] = (heat[k - 1] + heat[k - 2] + heat[k - 2]) / 3;
+      }
+        
+      // Step 3.  Randomly ignite new 'sparks' near the bottom
+      if( random(255) < Sparking ) {
+        int y = random(7);
+        heat[y] = heat[y] + random(160,255);
+        //heat[y] = random(160,255);
+      }
+      if(millis() -   timeFire > 1)
+      {
+         timeFire = millis();
+         countFire ++;
+         if(countFire >= NUM_LEDS)
+         {
+            countFire = 0;
+            stateFire = 1;
+              
+         }
+      } 
+      setPixelHeatColor(countFire, heat[countFire] );
+      showStrip();  
+      break;
+    case 1:
+      if(millis() -   timeFire > SpeedDelay)
+      {
+          timeFire = millis();
+          stateFire = 0;
+      }
+      break;
   }
-  
-  // Step 2.  Heat from each cell drifts 'up' and diffuses a little
-  for( int k= NUM_LEDS - 1; k >= 2; k--) {
-    heat[k] = (heat[k - 1] + heat[k - 2] + heat[k - 2]) / 3;
-  }
-    
-  // Step 3.  Randomly ignite new 'sparks' near the bottom
-  if( random(255) < Sparking ) {
-    int y = random(7);
-    heat[y] = heat[y] + random(160,255);
-    //heat[y] = random(160,255);
-  }
-
-  // Step 4.  Convert heat to LED colors
-  for( int j = 0; j < NUM_LEDS; j++) {
-    setPixelHeatColor(j, heat[j] );
-  }
-
-  showStrip();
-  delay(SpeedDelay);
 }
+
 
 void setPixelHeatColor (int Pixel, byte temperature) {
   // Scale 'heat' down from 0-255 to 0-191

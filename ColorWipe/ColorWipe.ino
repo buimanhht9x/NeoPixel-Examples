@@ -9,6 +9,10 @@
 //   NEO_GRB     Pixels are wired for GRB bitstream (most NeoPixel products)
 //   NEO_RGB     Pixels are wired for RGB bitstream (v1 FLORA pixels, not v2)
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(NUM_LEDS, PIN, NEO_GRB + NEO_KHZ800);
+uint32_t timeDelay = 0;
+uint8_t countNumLed = 0;
+uint8_t countEffColorWipe = 0;
+#define maxEff 13
 
 void setup() {
   strip.begin();
@@ -17,17 +21,71 @@ void setup() {
 
 // *** REPLACE FROM HERE ***
 void loop() {
-  colorWipe(0x00,0xff,0x00, 50);
-  colorWipe(0x00,0x00,0x00, 50);
+  switch(countEffColorWipe)
+  {
+    case 0:
+       colorWipe(0x00,0xff,0x00, 50);
+       break;
+    case 1:
+       colorWipe(0x00,0x00,0x00, 10);
+       break;
+    case 2:
+       colorWipe(0xff,0x00,0x00, 50);
+       break;
+    case 3:
+       colorWipe(0x00,0x00,0x00, 10);
+       break;
+    case 4:
+       colorWipe(0x00,0x00,0xff, 50);
+       break;
+    case 5:
+       colorWipe(0x00,0x00,0x00, 10);
+       break;
+    case 6:
+       colorWipe(0xff,0xff,0x00, 50);
+       break;
+    case 7:
+       colorWipe(0x00,0x00,0x00, 10);
+       break;
+    case 8:
+       colorWipe(0x00,0xff,0xff, 50);
+       break;
+    case 9:
+       colorWipe(0x00,0x00,0x00, 10);
+       break;
+    case 10:
+       colorWipe(0xff,0x00,0xff, 50);
+       break;
+    case 11:
+       colorWipe(0x00,0x00,0x00, 10);
+       break;
+    case 12:
+       colorWipe(0xff,0xff,0xff, 50);
+       break;
+    case 13:
+       colorWipe(0x00,0x00,0x00, 10);
+       break;
+  }
 }
 
 void colorWipe(byte red, byte green, byte blue, int SpeedDelay) {
-  for(uint16_t i=0; i<NUM_LEDS; i++) {
-      setPixel(i, red, green, blue);
-      showStrip();
-      delay(SpeedDelay);
+  
+  if(millis()  - timeDelay > SpeedDelay)
+  {
+    timeDelay = millis();
+    setPixel(countNumLed, red, green, blue);
+    showStrip();
+    countNumLed++;
+    if(countNumLed >= NUM_LEDS)
+    {
+      countNumLed =0;
+      countEffColorWipe ++;
+      if(countEffColorWipe > maxEff)
+        countEffColorWipe = 0;
+    }
   }
 }
+
 // *** REPLACE TO HERE ***
 
 void showStrip() {

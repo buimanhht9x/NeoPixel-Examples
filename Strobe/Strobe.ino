@@ -20,20 +20,48 @@ void loop() {
   // Slower:
   // Strobe(0xff, 0x77, 0x00, 10, 100, 1000);
   // Fast:
-  Strobe(0xff, 0x00, 0xff, 10, 50, 1000);
+  Strobe(0xff, 0x00, 0xff, 30, 50, 1000);
 }
+uint32_t timeStrobe = 0;
+int countStrobe = 0;
+uint8_t stateStrobe = 0;
 
 void Strobe(byte red, byte green, byte blue, int StrobeCount, int FlashDelay, int EndPause){
-  for(int j = 0; j < StrobeCount; j++) {
-    setAll(red,green,blue);
-    showStrip();
-    delay(FlashDelay);
-    setAll(0,0,0);
-    showStrip();
-    delay(FlashDelay);
+  switch(stateStrobe)
+  {
+     case 0:
+        if(millis() -   timeStrobe > FlashDelay)
+        {
+             timeStrobe = millis();
+             countStrobe ++;
+             if(countStrobe >= StrobeCount)
+             {
+                countStrobe = 0;
+                stateStrobe = 1;
+                setAll(0,0,0);
+                showStrip();
+             }
+             if(countStrobe %2 == 0)
+             {
+                setAll(red,green,blue);
+                showStrip();
+             }
+             else
+             {
+                setAll(0,0,0);
+                showStrip();
+             }  
+        }
+        break;
+     case 1:
+         
+         if(millis() -   timeStrobe > EndPause)
+        {
+             timeStrobe = millis();
+             stateStrobe = 0;
+        }
+        break;
   }
- 
- delay(EndPause);
 }
 // *** REPLACE TO HERE ***
 
